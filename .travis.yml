@@ -3,9 +3,10 @@ services:
   - docker
 env:
   global:
-    #creating an environment variable with latest commit to use in deploy.sh file
     - SHA=$(git rev-parse HEAD)
     - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+    - secure: Dklrc18+gnQrz8De+EuinMTQbc0ytEH0K0nrtZH71mVLyWISPhEewmpEAq4Puk6DOh/Iab2EAfX2bNn0mbRelWV9v30UyissX0sRvDNxEoDC0YVG0E52UbO91CDoo5Mji5PCBE21WZRSM8IVvbUFgE2tmppD8/gWVNGS3R6ZxfKLH5LZtihzw2SuZxNLnQqLZ/dSxFaYqxEldjsMti2MegoAdvYcpdFUkDPulSPVa5Zz9nAg7DawXzNGhBkalyF1fCh8rkNILiRuBJPS+EvCzrEC1wWPBj7XEeJ9G8D6Gsm4WH7qpyPpJsD2GshfBiU1wp5s/OKw+MlUUbv9ld8RoUoqE3gb1yEnHJlrq7acg06M9rkBuJiF9LB5kLiP0Mq+max1rRdtVbhrrMADIHSlrnLpqxzzJtYSPmNN4g1X+yrmtWSHs3s8YuDTqq05w6jnN3NoTeYUZPE6o3t4nKP25yFJIiAd2e3JN324KrJNI1omBXG6YdkyOi04jpf9ywjt3FryJB0RGND5eDBE+YivqQurgFbahDGz6GZmg0wwSmRrI6X6zZqgCJ+0oj8WHLtH1JUdHAzUAd5nYOKCpkrhb5T46w+OEZk55P233hAanWiURsg1AlEUIAE4zXoYeP18xO0D3e2ASE6zw3ddXXzq3czxwaAzH//n1hhQAzb3ylY=
+    - secure: e6im9vEnmH3dSz9OwgPCgdtv0MpGwYAeVwaYnpzcVRTF5Zy62R1U0V0sK6mwwTzAOAF5JvEeDQhPxZgGtxk8n2UgwV3XaO97wN0paL7yfHIeGI1oXyuAnoP8Scvb3zBPnGVRv6ZkRA+b0lIyZQLnM85dN8V0BK0894kjKc5wrf+nM+M41omn8v0AaxphlOc+x3LKRrApqkYqnCnlTniEUXJUIT5Nrywk3Vyq7Gzn5CvLSHRfTaUBDS9hx0VI6uAt0aJSpOFBYOF6KtLV7BahFGyVkAcGKqr8F9xQ336aY6qMpumd/BaHyRyKOp79Ic/x9Xd5zHmONf9jOPSZaCokfKV3CVzrrDeRCslZOHiS3LudfGMAhP03bdCAH2IzTNTBnVEz66AS0oMe1+BFCLNK9374SfTyzMpux6erl7E8j2pYOplqjHkTIx73HQQB+M8fbLetq/f5GHwtle4am8ioWkWpnhSGSo9X9XDowiFqnfjlJBGHPekhrc1Pm10TjtJ0DhU/wU5sp5qAbb8DX7LbtlFBdaMgdqN3Uci2Ix4vZehutCwUvY7J2xwtoi+ZMbTiQw9aT5gYWwa7IMImjzs05XJ3Zq6vqi9Hr7rsKvsMZjrWYuMNRdVFneYA+o++V+XqNEUsEwxHAK62WRIDfKrEf/d6Ef+Ck/1fihR9wtF18Jw=
 before_install:
   - openssl aes-256-cbc -K $encrypted_fc8829127f5d_key -iv $encrypted_fc8829127f5d_iv -in service-account.json.enc -out service-account.json -d
   - curl https://sdk.cloud.google.com | bash > /dev/null;
@@ -17,10 +18,8 @@ before_install:
   - gcloud container clusters get-credentials multi-cluster
   - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
   - docker build -t aashish-ghogre/react-test -f ./client/Dockerfile.dev ./client
-
 script:
   - docker run aashish-ghogre/react-test npm test -- --coverage
-
 deploy:
   provider: script
   script: bash ./deploy.sh
