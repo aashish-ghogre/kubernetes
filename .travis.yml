@@ -1,9 +1,28 @@
 sudo: required
 services:
   - docker
+env:
+  global:
+    #creating an environment variable with latest commit to use in deploy.sh file
+    - SHA=$(git rev-parse HEAD)
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 before_install:
   - openssl aes-256-cbc -K $encrypted_fc8829127f5d_key -iv $encrypted_fc8829127f5d_iv -in service-account.json.enc -out service-account.json -d
   - curl https://sdk.cloud.google.com | bash > /dev/null;
   - source $HOME/google-cloud-sdk/path.bash.inc
   - gcloud components update kubectl
   - gcloud auth activate-service-account --key-file service-account.json
+  - gcloud config set project analog-memento-250204
+  - gcloud config set compute/zone asia-south1-a
+  - gcloud container clusters get-credentials multi-cluster
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+  - docker build -t aashish-ghogre/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run aashish-ghogre/react-test npm test -- --coverage
+
+deploy:
+  provider: script
+  script: bash ./deploy.sh
+  on:
+    branch: master
